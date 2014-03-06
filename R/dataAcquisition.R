@@ -70,5 +70,14 @@ garminActivities$methods(
             stop("Connection to Garmin Connect failed - validation")
         } else {
             cat("User", username, "successfully connected to Garmin Connect", "\n")
+            return(curlHandle)
         }
     })
+
+garminActivities$methods(
+    retrieveGCactivityList = function() {
+        curlHandle <- connectGC()
+        json <- getURLContent(url = .garmin.constants()$urlGCactivityList, curl = curlHandle)
+        json
+    })
+    
