@@ -1,11 +1,25 @@
 garminActivities <- setRefClass(Class = "garminActivities",
                                 fields = list(username = "character",
-                                    password = "character"))
+                                              password = "character"))
 
+#' Login to Garmin Connect
+#'
+#' This method is called to login to Garmin Connect so that calls to the REST API are possible
+#'
+#' @param username Garmin Connect user name
+#' @param password Garmin Connect password
+#'  
+#' @keywords XXX
+#' @export
+#' @examples {
+#' act <- garminActivities$new()
+#' act$connectGC()
+#' }
 garminActivities$methods(
     connectGC = function(username = "stats290_test",
-                          password = "stats290_test") {
+                         password = "stats290_test") {
 
+        # Take CURL handle
         curlHandle <- getCurlHandle()
 
         curlSetOpt(curl = curlHandle,
@@ -15,29 +29,46 @@ garminActivities$methods(
                    header = TRUE)
         
         # Initial query to retrieve session and "flow execution key"
-        gcPreResp <- getURL(url = .garmin.constants()$urlGCsignin, curl = curlHandle)
+        answer <- getURL(url = .garmin.constants()$urlGCsignin, curl = curlHandle)
 
-        flowExecKey <- substr(x=gcPreResp, gregexpr(pattern="flowExecutionKey", text=gcPreResp)[[1]][1] + 19, gregexpr(pattern="flowExecutionKey", text=gcPreResp)[[1]][1] + 22)
+        # Extract "flow execution key" from answer
+        flowExecKey <- gsub("^.*<!-- flowExecutionKey: \\[(.+)\\] -->.*$", replacement="\\1", x = answer[1])
 
-        # Submit form
-        formResp <- postForm(uri=.garmin.constants()$urlGCsignin,
-                             .params=list(
-                                 "_eventId"="submit",
-                                 "displayNameRequired"="false",
-                                 "embed"="true",
-                                 "lt"=flowExecKey,
-                                 "password"=password,
-                                 "username"=username),
-                             curl=curlHandle,
-                             style="POST",
-                             .checkParams=TRUE
+        # Error
+        if (flowExecKey == answer[1])
+            stop("Connection to Garmin Connect failed - flowExecKey")
+
+        # Submit login form
+        answer <- postForm(uri = .garmin.constants()$urlGCsignin,
+                             .params = list(
+                                 "_eventId" = "submit",
+                                 "displayNameRequired" = "false",
+                                 "embed" = "true",
+                                 "lt" = flowExecKey,
+                                 "password" = password,
+                                 "username" = username),
+                             curl = curlHandle,
+                             style = "POST",
+                             .checkParams = TRUE
                              )
 
-        url <- substr(x=formResp[1], gregexpr(pattern="response_url", text=formResp[1])[[1]][1], gregexpr(pattern="response_url", text=formResp[1])[[1]][1] + 200)
-        url <- substr(x=url, gregexpr(pattern="'", text=url)[[1]][1] + 1, gregexpr(pattern="'", text=url)[[1]][2] - 1)
+        # Retrieve post auth URL
+        url <- gsub("^.*response_url += +'(.*?)';.*$", replacement="\\1", x = answer[1])
 
-        html <- getURL(url = url, curl = curlHandle, .opts=list(followlocation = TRUE))
+        # Error
+        if (url == answer[1])
+            stop("Connection to Garmin Connect failed - post auth url")
+        
+        # Finish auth process
+        answer <- getURL(url = url, curl = curlHandle, .opts = list(followlocation = TRUE))
 
-        json <- getURLContent(url = .garmin.constants()$urlGCsearch, curl = curlHandle)
-        json
+        # Test login
+        testLogin <- getURLContent(url = .garmin.constants()$urlGCvalidate, curl = curlHandle)
+
+        # Status report
+        if (identical(grep(pattern = username, x = testLogin), character(0))) {
+            stop("Connection to Garmin Connect failed - validation")
+        } else {
+            cat("User", username, "successfully connected to Garmin Connect", "\n")
+        }
     })
