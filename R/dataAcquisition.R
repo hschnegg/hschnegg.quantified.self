@@ -78,6 +78,8 @@ garminActivities$methods(
     retrieveGCactivityList = function() {
         curlHandle <- connectGC()
         json <- getURLContent(url = .garmin.constants()$urlGCactivityList, curl = curlHandle)
-        json
+        list <- fromJSON(json)
+        activities <- sapply(X=list$results$activities, FUN=function(l) l$activity$activityId)
+        return(activities)
     })
     
