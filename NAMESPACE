@@ -1,2 +1,4 @@
+exportClasses(garminActivities)
 import(RCurl)
+import(XML)
 import(rjson)

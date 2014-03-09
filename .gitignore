@@ -1,4 +1,5 @@
 *.RHistory
+*.Rapp.history
 *.*~
 *~
 *.#*

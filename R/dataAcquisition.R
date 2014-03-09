@@ -1,3 +1,17 @@
+#' Garmin Activity Class
+#'
+#' This class offers the framework to deal with Garmin Connect data
+#'
+#' @export
+#' @import RCurl
+#' @import rjson
+#' @import XML
+#' 
+#' @keywords XXX
+#' @examples {
+#' act <- garminActivities$new()
+#' act$connectGC()
+#' }
 garminActivities <- setRefClass(Class = "garminActivities",
                                 fields = list(username = "character",
                                               password = "character"))
@@ -9,21 +23,9 @@ garminActivities$methods(
         callSuper(...)
     })
 
-#' Login to Garmin Connect
-#'
-#' This method is called to login to Garmin Connect so that calls to the REST API are possible
-#'
-#' @param username Garmin Connect user name
-#' @param password Garmin Connect password
-#'  
-#' @keywords XXX
-#' @export
-#' @examples {
-#' act <- garminActivities$new()
-#' act$connectGC()
-#' }
 garminActivities$methods(
     connectGC = function() {
+        "Login to Garmin Connect (website)"
 
         # Take CURL handle
         curlHandle <- getCurlHandle()
@@ -79,20 +81,11 @@ garminActivities$methods(
             return(curlHandle)
         }
     })
-
-#' Retrieve latest activities from Garmin Connect as a data.frame
-#'
-#' This method connect to Garmin Connect and access the REST API to retrieve a
-#' list of the latest activities
-#' 
-#' @keywords XXX
-#' @export
-#' @examples {
-#' act <- garminActivities$new()
-#' act$retrieveGCactivityList()
-#' }
+ 
 garminActivities$methods(
     retrieveGCactivityList = function() {
+        "Retrieve a list of the most recent activities posted to Garmin Connect"
+        
         # Retrieve latest activities from GC REST API
         curlHandle <- connectGC()
         jsonAct <- getURLContent(url = .garmin.constants()$urlGCactivityList, curl = curlHandle)
@@ -110,21 +103,10 @@ garminActivities$methods(
         return(activityList)
     })
 
-#' Download activity from Garmin Connect
-#'
-#' This method takes a connection to Garmin Connect, downloads the TCX file of an activity,
-#' and saves it in the /inst/extdata folder of the package
-#'
-#' @param activityId A Garmin Connect activity ID
-#'  
-#' @keywords XXX
-#' @export
-#' @examples {
-#' act <- garminActivities$new()
-#' act$downloadTCX(454818889)
-#' }
 garminActivities$methods(
     downloadTCX = function(activityId) {
+        "Download the TCX file for a given activity from Garmin Connect. The file is saved in /inst/extdata"
+        
         curlHandle <- connectGC()
 
         fileName <- paste0(system.file(package = .global.constants()$packageName, "inst", "extdata"), paste0("/activity_", activityId, ".tcx"))
