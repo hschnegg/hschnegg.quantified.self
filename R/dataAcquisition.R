@@ -2,6 +2,13 @@ garminActivities <- setRefClass(Class = "garminActivities",
                                 fields = list(username = "character",
                                               password = "character"))
 
+garminActivities$methods(
+    initialize = function(...) {
+        username <<- "stats290_test"
+        password <<- "stats290_test"
+        callSuper(...)
+    })
+
 #' Login to Garmin Connect
 #'
 #' This method is called to login to Garmin Connect so that calls to the REST API are possible
@@ -16,8 +23,7 @@ garminActivities <- setRefClass(Class = "garminActivities",
 #' act$connectGC()
 #' }
 garminActivities$methods(
-    connectGC = function(username = "stats290_test",
-                         password = "stats290_test") {
+    connectGC = function() {
 
         # Take CURL handle
         curlHandle <- getCurlHandle()
@@ -74,12 +80,30 @@ garminActivities$methods(
         }
     })
 
+#' Retrieve latest activities from Garmin Connect as a data.frame
+#'  
+#' @keywords XXX
+#' @export
+#' @examples {
+#' act <- garminActivities$new()
+#' act$retrieveGCactivityList()
+#' }
 garminActivities$methods(
     retrieveGCactivityList = function() {
+        # Retrieve latest activities from GC REST API
         curlHandle <- connectGC()
-        json <- getURLContent(url = .garmin.constants()$urlGCactivityList, curl = curlHandle)
-        list <- fromJSON(json)
-        activities <- sapply(X=list$results$activities, FUN=function(l) l$activity$activityId)
-        return(activities)
+        jsonAct <- getURLContent(url = .garmin.constants()$urlGCactivityList, curl = curlHandle)
+        listAct <- fromJSON(jsonAct)
+
+        # Format activities into a data frame
+        activityList <- sapply(X=listAct$results$activities, FUN=function(l) {
+            c(l$activity$activityId,
+              l$activity$beginTimestamp$value,
+              l$activity$activityName$value)
+        })
+        activityList <- as.data.frame(t(activityList))
+        names(activityList) <- c("id", "date", "name")
+        
+        return(activityList)
     })
     
