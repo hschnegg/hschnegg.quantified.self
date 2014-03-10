@@ -14,12 +14,16 @@
 #' }
 garminActivities <- setRefClass(Class = "garminActivities",
                                 fields = list(username = "character",
-                                              password = "character"))
+                                              password = "character",
+                                              act = "integer",
+                                              lap = "integer"))
 
 garminActivities$methods(
     initialize = function(...) {
         username <<- "stats290_test"
         password <<- "stats290_test"
+        act <<- 0L
+        lap <<- 0L
         callSuper(...)
     })
 
@@ -111,16 +115,30 @@ garminActivities$methods(
 
         fileName <- paste0(system.file(package = .global.constants()$packageName, "inst", "extdata"), paste0("/activity_", activityId, ".tcx"))
         urlTcxFile <- sub(pattern = "XXX", replacement = activityId, x = .garmin.constants()$urlGCtcxFile)
-        
-        #f = CFILE(filename = fileName, mode= "w")
-        #curlPerform(url = urlTcxFile, writedata = f@ref, curl = curlHandle, .encoding="UTF-8")
-        #close(f)
 
         activity <- getURLContent(url = urlTcxFile, curl = curlHandle)
         write(x = activity, file = fileName)
         cat("File", fileName, "available", "\n")
     })
 
+garminActivities$methods(
+    readTcx = function(activityId) {
+        fileName <- paste0(system.file(package = .global.constants()$packageName, "inst", "extdata"), paste0("/activity_", activityId, ".tcx"))
 
+        return(0)
+    })
 
-
+garminActivities$methods(
+    saxHandler = function() {
+        Activity <- function(node) {
+            #activityId <- xmlValue(node[["Id"]])
+            act <<- act + 1L
+        }
+        #c(Activity=xmlParserContextFunction(Activity))
+        Lap <- function(node) {
+            #LapId <- xmlValue(node[["Calories"]])
+            lap <<- lap + 1L
+        }
+        list(Activity = Activity, Lap = Lap)
+    })
+            
