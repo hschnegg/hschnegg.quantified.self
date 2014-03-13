@@ -16,7 +16,11 @@ garminActivities <- setRefClass(Class = "garminActivities",
                                 fields = list(username = "character",
                                               password = "character",
                                               act = "integer",
-                                              lap = "integer"))
+                                              lap = "integer",
+                                              lapId = "integer",
+                                              trackpointId = "integer",
+                                              vec = "character"
+                                    ))
 
 garminActivities$methods(
     initialize = function(...) {
@@ -24,6 +28,8 @@ garminActivities$methods(
         password <<- "stats290_test"
         act <<- 0L
         lap <<- 0L
+        lapId <<- 0L
+        trackpointId <<- 0L
         callSuper(...)
     })
 
@@ -123,22 +129,99 @@ garminActivities$methods(
 
 garminActivities$methods(
     readTcx = function(activityId) {
+        
         fileName <- paste0(system.file(package = .global.constants()$packageName, "inst", "extdata"), paste0("/activity_", activityId, ".tcx"))
 
-        return(0)
-    })
+        doc <- xmlTreeParse(file = fileName, useInternalNodes = TRUE)
 
-garminActivities$methods(
-    saxHandler = function() {
-        Activity <- function(node) {
-            #activityId <- xmlValue(node[["Id"]])
-            act <<- act + 1L
-        }
-        #c(Activity=xmlParserContextFunction(Activity))
-        Lap <- function(node) {
-            #LapId <- xmlValue(node[["Calories"]])
-            lap <<- lap + 1L
-        }
-        list(Activity = Activity, Lap = Lap)
+        # iterate over activities
+        xpathApply(doc = doc, path="//ns:Activity", namespaces="ns", function(act) {
+            actSport <- unlist(getNodeSet(doc = act,
+                                          path = "//@Sport",
+                                          namespaces="ns"))
+            actTimestamp <- unlist(getNodeSet(doc = act,
+                                              path = "//ns:Id",
+                                              namespaces="ns",
+                                              fun=xmlValue))
+            # iterate over laps
+            xpathApply(doc = act, path="//ns:Lap", namespaces="ns", function(lp) {
+                #lapId <<- lapId + 1L
+                lapTimestamp <- unlist(getNodeSet(doc = lp,
+                                                  path = "//@StartTime",
+                                                  namespaces="ns"))
+                lapTime <- unlist(getNodeSet(doc = lp,
+                                             path = "//ns:TotalTimeSeconds",
+                                             namespaces="ns",
+                                             fun=xmlValue))
+                lapDistance <- unlist(getNodeSet(doc = lp,
+                                                 path = "//ns:DistanceMeters",
+                                                 namespaces="ns",
+                                                 fun=xmlValue))
+                lapCalories <- unlist(getNodeSet(doc = lp,
+                                                 path = "//ns:Calories",
+                                                 namespaces="ns",
+                                                 fun=xmlValue))
+                lapAvgHr <- unlist(getNodeSet(doc = lp,
+                                              path = "//ns:AverageHeartRateBpm",
+                                              namespaces="ns",
+                                              fun=xmlValue))
+                lapMaxHr <- unlist(getNodeSet(doc = lp,
+                                              path = "//ns:MaximumHeartRateBpm",
+                                              namespaces="ns",
+                                              fun=xmlValue))
+                lapIntensity <- unlist(getNodeSet(doc = lp,
+                                                  path = "//ns:Intensity",
+                                                  namespaces="ns",
+                                                  fun=xmlValue))
+                lapTrigger <- unlist(getNodeSet(doc = lp,
+                                                path = "//ns:TriggerMethod",
+                                                namespaces="ns",
+                                                fun=xmlValue))
+                # iterate over tracks
+                xpathApply(doc = lp, path="//ns:Track", namespaces="ns", function(t) {
+                    # iterate over trackpoints
+                    xpathApply(doc = t, path="//ns:Trackpoint", namespaces="ns", function(tp) {
+                        tpTimestamp <- unlist(getNodeSet(doc = tp,
+                                                         path = "//ns:Time",
+                                                         namespaces="ns",
+                                                         fun=xmlValue))
+                        tpLat <- unlist(getNodeSet(doc = tp,
+                                                   path = "//ns:Position/ns:LatitudeDegrees",
+                                                   namespaces="ns",
+                                                   fun=xmlValue))
+                        tpLong <- unlist(getNodeSet(doc = tp,
+                                                    path = "//ns:Position/ns:LongitudeDegrees",
+                                                    namespaces="ns",
+                                                    fun=xmlValue))
+                        tpAlt <- unlist(getNodeSet(doc = tp,
+                                                   path = "//ns:AltitudeMeters",
+                                                   namespaces="ns",
+                                                   fun=xmlValue))
+                        tpDist <- unlist(getNodeSet(doc = tp,
+                                                    path = "//ns:DistanceMeters",
+                                                    namespaces="ns",
+                                                    fun=xmlValue))
+                        tpSpeed <- unlist(getNodeSet(doc = tp,
+                                                     path = "//ns:Extensions/ex:TPX/ex:Speed",
+                                                     namespaces=c(
+                                                         ns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2",
+                                                         ex="http://www.garmin.com/xmlschemas/ActivityExtension/v2"),
+                                                     fun=xmlValue))
+                        tpCadence <- unlist(getNodeSet(doc = tp,
+                                                       path = "//ns:Extensions/ex:TPX/ex:RunCadence",
+                                                       namespaces=c(
+                                                           ns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2",
+                                                           ex="http://www.garmin.com/xmlschemas/ActivityExtension/v2"),
+                                                       fun=xmlValue))
+                        #df <<- rbind(df, c(lapId, tpTimestamp, tpLat, tpLong, tpAlt, tpDist, tpSpeed, tpCadence))
+                        tp <- c(tpTimestamp, tpLat, tpLong, tpAlt, tpDist, tpSpeed, tpCadence)
+                        assign(x="vec", value=tp, inherits=TRUE)
+                        #.self$trackpointId <<- 5L
+                        #return(tp)
+                    })
+                })
+            })
+        })
+        return(0)
     })
             
