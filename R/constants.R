@@ -5,6 +5,16 @@
 
 }
 
+.database.constants <- function() {
+    "Constants used to work with package database"
+
+    dbFileName <- "hschnegg.quantified.self.db"
+    db <- system.file(package = .global.constants()$packageName, "inst", "extdata", dbFileName)
+
+    list(db = db)
+    
+}
+
 .garmin.constants <- function() {
     "Constants used to work with Garmin data"
 
