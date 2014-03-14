@@ -200,3 +200,23 @@ tcxFile$methods(
             NULL
         })
     })
+
+tcxFile$methods(
+    saveToDb = function() {
+        driver <- dbDriver("SQLite")
+        db <- .database.constants()$db
+        con <- dbConnect(drv = driver, dbname = db)
+
+        listOfTables <- c("activity", "lap", "trackpoint")
+
+        ignore <- lapply(listOfTables, function(t) {
+            status <- dbWriteTable(conn = con, name = t, value = get(t), row.names = FALSE, append = TRUE)
+            if (status == TRUE) {
+                cat(t, "data written to database.", "\n")
+            } else {
+                stop("Failed to write ", t, " data to database!")
+            }
+        })
+        
+
+    })
