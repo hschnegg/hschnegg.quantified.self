@@ -203,20 +203,42 @@ tcxFile$methods(
 
 tcxFile$methods(
     saveToDb = function() {
+        "Save the 3 activity data frames to the package database."
+        
         driver <- dbDriver("SQLite")
         db <- .database.constants()$db
         con <- dbConnect(drv = driver, dbname = db)
 
+        activity_ <- transform(activity, timestamp = format(timestamp, format = "%Y-%m-%dT%H:%M:%S.", usetz = TRUE))
+        lap_ <- transform(lap, timestamp = format(timestamp, format = "%Y-%m-%dT%H:%M:%S.", usetz = TRUE))
+        trackpoint_ <- transform(trackpoint, timestamp = format(timestamp, format = "%Y-%m-%dT%H:%M:%S.", usetz = TRUE))
+        
         listOfTables <- c("activity", "lap", "trackpoint")
 
         ignore <- lapply(listOfTables, function(t) {
-            status <- dbWriteTable(conn = con, name = t, value = get(t), row.names = FALSE, append = TRUE)
+            t_ <- paste0(t, "_")
+            status <- dbWriteTable(conn = con, name = t, value = get(t_), row.names = FALSE, append = TRUE)
             if (status == TRUE) {
                 cat(t, "data written to database.", "\n")
             } else {
                 stop("Failed to write ", t, " data to database!")
             }
         })
-        
+    })
 
+tcxFile$methods(
+    readFromDb = function() {
+        "Retrieve the 3 activity data frames from the package database."
+        
+        driver <- dbDriver("SQLite")
+        db <- .database.constants()$db
+        con <- dbConnect(drv = driver, dbname = db)
+
+        activity <<- dbReadTable(conn = con, name = "activity")
+        lap <<- dbReadTable(conn = con, name = "lap")
+        trackpoint <<- dbReadTable(conn = con, name = "trackpoint")
+
+        activity <<- transform(activity, timestamp = as.POSIXct(timestamp, format = "%Y-%m-%dT%H:%M:%S."))
+        lap <<- transform(lap, timestamp = as.POSIXct(timestamp, format = "%Y-%m-%dT%H:%M:%S."))
+        trackpoint <<- transform(trackpoint, timestamp = as.POSIXct(timestamp, format = "%Y-%m-%dT%H:%M:%S."))
     })
