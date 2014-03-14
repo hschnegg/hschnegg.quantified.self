@@ -1,12 +1,25 @@
-#' TCX File  Class
+#' TCX File Class
 #'
-#' 
+#' Class used to manage a typycal Garmin Connect file (.tcx). The class has 3 fields used to store the main
+#' components stored in a tcx file:
+#' - Activity: as recorded by a Garmin fitness device
+#' - Lap: the higher level of activity breakdown. A lap is either based on a fixed distance (1 Mile, 1 KM) or
+#'   defined by when the user is hitting the lap button on her device
+#' - Trackpoint: log of all the points recorded by the device
+#'
+#' The 3 components are stored in 3 data frames which are fields of the class.
+#'
+#' read method:
+#' The read method is used to read and parse a .tcx file. The method expects the Garmin Connect identifier of
+#' the activity as a parameter.
 #'
 #' @export
 #' @import XML
 #' 
-#' @keywords XXX
+#' @keywords fitness, data
 #' @examples {
+#' f <- tcxFile$new()
+#' f$read(439915418)
 #' }
 tcxFile <- setRefClass(Class = "tcxFile",
                        fields = list(activity = "data.frame",
@@ -19,6 +32,7 @@ tcxFile$methods(
                                 sport = character(),
                                 timestamp = as.POSIXct(character(), format = "%Y-%m-%dT%H:%M:%S."),
                                 stringsAsFactors = FALSE)
+        
         lap <<- data.frame(activity_id = character(),
                            lap_id = integer(),
                            timestamp = as.POSIXct(character(), format = "%Y-%m-%dT%H:%M:%S."),
@@ -35,6 +49,7 @@ tcxFile$methods(
                            avg_cadence = integer(),
                            steps = integer(),
                            stringsAsFactors = FALSE)
+        
         trackpoint <<- data.frame(activity_id = character(),
                                   lap_id = integer(),
                                   tp_id = integer(),
@@ -44,13 +59,15 @@ tcxFile$methods(
                                   altitude = numeric(),
                                   distance = numeric(),
                                   speed = numeric(),
-                                  cadence = numeric(),
+                                  cadence = integer(),
                                   stringsAsFactors = FALSE)
         callSuper(...)
     })
 
 tcxFile$methods(
-    readTcx = function(activityId) {
+    read = function(activityId) {
+        "The read method is used to read and parse a .tcx file. The method expects the Garmin Connect identifier of
+#' the activity as a parameter."
         
         fileName <- paste0(system.file(package = .global.constants()$packageName, "inst", "extdata"), paste0("/activity_", activityId, ".tcx"))
 
@@ -65,7 +82,7 @@ tcxFile$methods(
                                           namespaces="ns",
                                           fun=xmlValue))
 
-        activity[1, ] <<- data.frame(activityId, actSport, actTimestamp)
+        activity[1, ] <<- data.frame(activityId, actSport, actTimestamp, stringsAsFactors = FALSE)
 
         # Retrieve laps
         lapTimestamp <- unlist(getNodeSet(doc = doc,
@@ -131,7 +148,7 @@ tcxFile$methods(
         lapCount <- length(lapTimestamp)
         lapId <- seq(from = 1, to = lapCount) 
 
-        lap <<- data.frame(activityId, lapId, lapTimestamp, lapTime, lapDistance, lapAvgSpeed, lapMaxSpeed, lapCalories, lapAvgHr, lapMaxHr, lapIntensity, lapTrigger, lapMaxCadence, lapAvgCadence, lapSteps)
+        lap[lapId, ] <<- data.frame(activityId, lapId, lapTimestamp, lapTime, lapDistance, lapAvgSpeed, lapMaxSpeed, lapCalories, lapAvgHr, lapMaxHr, lapIntensity, lapTrigger, lapMaxCadence, lapAvgCadence, lapSteps, stringsAsFactors = FALSE)
         
         # Retrieve Trackpoints
         ignore <- lapply(lapId, function(l) {
@@ -174,7 +191,7 @@ tcxFile$methods(
             tpCount <- length(tpTimestamp)           
             tpId <- seq(from = (lastId + 1), to = (lastId + tpCount))
             
-            trackpoint[tpId, ] <<- data.frame(rep(activityId, tpCount), rep(l, tpCount), tpId, tpTimestamp, tpLat, tpLong, tpAlt, tpDist, tpSpeed, tpCadence)
+            trackpoint[tpId, ] <<- data.frame(rep(activityId, tpCount), rep(l, tpCount), tpId, tpTimestamp, tpLat, tpLong, tpAlt, tpDist, tpSpeed, tpCadence, stringsAsFactors = FALSE)
 
             NULL
         })
