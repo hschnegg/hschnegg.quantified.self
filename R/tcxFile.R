@@ -15,6 +15,7 @@
 #'
 #' @export
 #' @import XML
+#' @import RSQLite
 #' 
 #' @keywords fitness, data
 #' @examples {
@@ -69,7 +70,10 @@ tcxFile$methods(
         "The read method is used to read and parse a .tcx file. The method expects the Garmin Connect identifier of
 #' the activity as a parameter."
         
-        fileName <- paste0(system.file(package = .global.constants()$packageName, "inst", "extdata"), paste0("/activity_", activityId, ".tcx"))
+        fileName <- system.file(package = .global.constants()$packageName, "inst", "extdata", paste0("activity_", activityId, ".tcx"))
+
+        if (fileName == "")
+            stop(paste0("Missing file: activity_", activityId, ".tcx"))
 
         doc <- xmlTreeParse(file = fileName, useInternalNodes = TRUE)
 
