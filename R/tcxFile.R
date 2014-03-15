@@ -245,7 +245,7 @@ tcxFile$methods(
         "Retrieve the activity data frames from the package database. Parameter activityId controls which activity to retrieve (missing is all). Parameter dataFrames controls which data frame to retrieve (missing or 'all' would retrieve all of them). The data frames are stored in the class fields."
 
         dataFrames <- match.arg(arg=dataFrames, choices=c("all", "activity", "lap", "trackpoint"), several.ok=TRUE)
-        if (dataFrames == "all")
+        if ("all" %in% dataFrames)
             dataFrames <- c("activity", "lap", "trackpoint")
         
         if (activityId == "")
