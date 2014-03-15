@@ -81,17 +81,17 @@ tcxFile$methods(
         actSport <- unlist(getNodeSet(doc = doc,
                                       path = "//@Sport",
                                       namespaces="ns"))
-        actTimestamp <- unlist(getNodeSet(doc = doc,
-                                          path = "//ns:Id",
-                                          namespaces="ns",
-                                          fun=xmlValue))
+        actTimestamp <- as.POSIXct(unlist(getNodeSet(doc = doc,
+                                                     path = "//ns:Id",
+                                                     namespaces="ns",
+                                                     fun=xmlValue)), format = "%Y-%m-%dT%H:%M:%S.")
 
         activity[1, ] <<- data.frame(activityId, actSport, actTimestamp, stringsAsFactors = FALSE)
 
         # Retrieve laps
-        lapTimestamp <- unlist(getNodeSet(doc = doc,
-                                          path = "//ns:Activity[1]/ns:Lap/@StartTime",
-                                          namespaces = "ns"))
+        lapTimestamp <- as.POSIXct(unlist(getNodeSet(doc = doc,
+                                                     path = "//ns:Activity[1]/ns:Lap/@StartTime",
+                                                     namespaces = "ns")), format = "%Y-%m-%dT%H:%M:%S.")
         lapTime <- as.numeric(unlist(getNodeSet(doc = doc,
                                                 path = "//ns:Activity[1]/ns:Lap/ns:TotalTimeSeconds",
                                                 namespaces="ns",
@@ -156,10 +156,10 @@ tcxFile$methods(
         
         # Retrieve Trackpoints
         ignore <- lapply(lapId, function(l) {
-            tpTimestamp <- unlist(getNodeSet(doc = doc,
-                                             path = paste0("//ns:Activity[1]/ns:Lap[", l, "]/ns:Track/ns:Trackpoint/ns:Time"),
-                                             namespaces="ns",
-                                             fun=xmlValue))
+            tpTimestamp <- as.POSIXct(unlist(getNodeSet(doc = doc,
+                                                        path = paste0("//ns:Activity[1]/ns:Lap[", l, "]/ns:Track/ns:Trackpoint/ns:Time"),
+                                                        namespaces="ns",
+                                                        fun=xmlValue)), format = "%Y-%m-%dT%H:%M:%S.")
             tpLat <- as.numeric(unlist(getNodeSet(doc = doc,
                                                   path = paste0("//ns:Activity[1]/ns:Lap[", l, "]/ns:Track/ns:Trackpoint/ns:Position/ns:LatitudeDegrees"),
                                                   namespaces="ns",
