@@ -33,7 +33,7 @@ parameter.
 \item \code{retrieveActivityList()}: Retrieve a list of the most recent activities posted to Garmin Connect
 }}
 \examples{
-{
+\dontrun{
 gc <- garminConnect$new()
 gc$login()
 gc$retrieveActivityList()

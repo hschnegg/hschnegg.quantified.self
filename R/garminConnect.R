@@ -26,7 +26,7 @@
 #' @import rjson
 #' 
 #' @keywords fitness, data
-#' @examples {
+#' @examples \dontrun{
 #' gc <- garminConnect$new()
 #' gc$login()
 #' gc$retrieveActivityList()

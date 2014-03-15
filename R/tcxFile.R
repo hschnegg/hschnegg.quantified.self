@@ -25,7 +25,7 @@
 #' @import RSQLite
 #' 
 #' @keywords fitness, data
-#' @examples {
+#' @examples \dontrun{
 #' f <- tcxFile$new()
 #' f$read(439915418)
 #' f$saveToDb(439915418)
