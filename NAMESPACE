@@ -1,4 +1,6 @@
-exportClasses(garminActivities)
+exportClasses(garminConnect)
+exportClasses(tcxFile)
 import(RCurl)
+import(RSQLite)
 import(XML)
 import(rjson)

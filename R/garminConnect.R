@@ -3,6 +3,24 @@
 #' This class offers the framework to deal with accessing Garmin Connect
 #' (connect.garmin.com)
 #'
+#' username field:
+#' Your Garmin Connect username
+#'
+#' password field:
+#' Your Garmin Connect password
+#'
+#' login method:
+#' Open a connection to the Garmin Connect web site using the username and password fields to log you in. Returns
+#' the CURL handle that can be used to issue queries against the Garmin Connect REST API.
+#'
+#' retrieveActivityList method:
+#' Retrieve a list of the latest activities stored in Garmin Connect
+#'
+#' downloadTcx method:
+#' Download the TCX file for a given activity from Garmin Connect. The file is saved in /inst/extdata. The
+#' method expects an Activity Id as a parameter.
+#' 
+#'
 #' @export
 #' @import RCurl
 #' @import rjson
@@ -11,6 +29,8 @@
 #' @examples {
 #' gc <- garminConnect$new()
 #' gc$login()
+#' gc$retrieveActivityList()
+#' gc$download(454818889)
 #' }
 garminConnect <- setRefClass(Class = "garminConnect",
                                 fields = list(username = "character",
@@ -97,7 +117,7 @@ garminConnect$methods(
         "Retrieve a list of the most recent activities posted to Garmin Connect"
         
         # Retrieve latest activities from GC REST API
-        curlHandle <- connectGC()
+        curlHandle <- login()
         jsonAct <- getURLContent(url = .garmin.constants()$urlGCactivityList, curl = curlHandle)
         listAct <- fromJSON(jsonAct)
 
@@ -114,10 +134,10 @@ garminConnect$methods(
     })
 
 garminConnect$methods(
-    downloadTCX = function(activityId) {
+    downloadTcx = function(activityId) {
         "Download the TCX file for a given activity from Garmin Connect. The file is saved in /inst/extdata"
         
-        curlHandle <- connectGC()
+        curlHandle <- login()
 
         fileName <- paste0(system.file(package = .global.constants()$packageName, "inst", "extdata"), paste0("/activity_", activityId, ".tcx"))
         urlTcxFile <- sub(pattern = "XXX", replacement = activityId, x = .garmin.constants()$urlGCtcxFile)
