@@ -17,8 +17,10 @@
 #' Save the 3 activity data frames stored in the class fields to the package database.
 #'
 #' readFromDb method:
-#' Retrieve the 3 activity data frames from the package database. Store the data frames into the class fields.
-#' This method retrieves all the activities stored in the database.
+#' Retrieve the activity data frames from the package database.
+#' - Parameter activityId: controls which activity to retrieve (missing is all).
+#' - Parameter dataFrames: controls which data frame to retrieve (missing or 'all' would retrieve all of them).
+#' The data frames are stored in the class fields
 #' 
 #' @export
 #' @import XML
@@ -239,18 +241,31 @@ tcxFile$methods(
     })
 
 tcxFile$methods(
-    readFromDb = function() {
-        "Retrieve the 3 activity data frames from the package database. This method retrieves all the activities stored in the database."
+    readFromDb = function(activityId = "", dataFrames = "all") {
+        "Retrieve the activity data frames from the package database. Parameter activityId controls which activity to retrieve (missing is all). Parameter dataFrames controls which data frame to retrieve (missing or 'all' would retrieve all of them). The data frames are stored in the class fields."
+
+        dataFrames <- match.arg(arg=dataFrames, choices=c("all", "activity", "lap", "trackpoint"), several.ok=TRUE)
+        if (dataFrames == "all")
+            dataFrames <- c("activity", "lap", "trackpoint")
         
+        if (activityId == "")
+            activityId <- "activity_id"
+        else
+            activityId <- paste0("'", activityId, "'")
+    
         driver <- dbDriver("SQLite")
         db <- .database.constants()$db
         con <- dbConnect(drv = driver, dbname = db)
 
-        activity <<- dbReadTable(conn = con, name = "activity")
-        lap <<- dbReadTable(conn = con, name = "lap")
-        trackpoint <<- dbReadTable(conn = con, name = "trackpoint")
-
-        activity <<- transform(activity, timestamp = as.POSIXct(timestamp, format = "%Y-%m-%dT%H:%M:%S."))
-        lap <<- transform(lap, timestamp = as.POSIXct(timestamp, format = "%Y-%m-%dT%H:%M:%S."))
-        trackpoint <<- transform(trackpoint, timestamp = as.POSIXct(timestamp, format = "%Y-%m-%dT%H:%M:%S."))
+        ignore <- lapply(dataFrames, function(t) {
+            sql <- paste0("select * from ", t, " where activity_id = ", activityId)
+            res <- dbGetQuery(con, sql)
+            res <- transform(res, timestamp = as.POSIXct(timestamp, format = "%Y-%m-%dT%H:%M:%S."))
+            if (nrow(res) == 0) {
+                cat("No", t, "data for activity", activityId, "\n")
+            } else {
+                assign(x = t, value = res, inherits = TRUE)
+                cat("Retrieved", t, "data", "\n")
+            }
+        })
     })

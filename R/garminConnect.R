@@ -1,4 +1,4 @@
-#' Garmin Activity Connect Class
+#' Garmin Connect Class
 #'
 #' This class offers the framework to deal with accessing Garmin Connect
 #' (connect.garmin.com)
