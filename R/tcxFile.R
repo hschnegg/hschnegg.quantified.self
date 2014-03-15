@@ -10,8 +10,8 @@
 #' The 3 components are stored in 3 data frames which are fields of the class.
 #'
 #' read method:
-#' The read method is used to read and parse a .tcx file. The method expects the Garmin Connect identifier of
-#' the activity as a parameter.
+#' The read method is used to read and parse a local .tcx file. The method expects the Garmin Connect identifier
+#' of an activity or a file name as a parameter. The file should be stored in the /inst/extdata folder.
 #'
 #' saveToDb method:
 #' Save the 3 activity data frames stored in the class fields to the package database.
@@ -75,14 +75,17 @@ tcxFile$methods(
     })
 
 tcxFile$methods(
-    read = function(activityId) {
-        "The read method is used to read and parse a .tcx file. The method expects the Garmin Connect identifier of
-#' the activity as a parameter."
+    read = function(activityId = "", fileName = "") {
+        "The read method is used to read and parse a local .tcx file. The method expects the Garmin Connect identifier of an activity or a file name as a parameter. The file should be stored in the /inst/extdata folder."
         
-        fileName <- system.file(package = .global.constants()$packageName, "inst", "extdata", paste0("activity_", activityId, ".tcx"))
+        if (activityId != "") {
+            fileName <- system.file(package = .global.constants()$packageName, "inst", "extdata", paste0("activity_", activityId, ".tcx"))
+        } else if (fileName != "") {
+            fileName <- system.file(package = .global.constants()$packageName, "inst", "extdata", fileName)
+        }
 
         if (fileName == "")
-            stop(paste0("Missing file: activity_", activityId, ".tcx"))
+            stop(paste0("File not found."))
 
         doc <- xmlTreeParse(file = fileName, useInternalNodes = TRUE)
 
@@ -212,7 +215,7 @@ tcxFile$methods(
 
 tcxFile$methods(
     saveToDb = function() {
-        "Save the 3 activity data frames to the package database."
+        "Save the 3 activity data frames (see fields) to the package database."
         
         driver <- dbDriver("SQLite")
         db <- .database.constants()$db
@@ -237,7 +240,7 @@ tcxFile$methods(
 
 tcxFile$methods(
     readFromDb = function() {
-        "Retrieve the 3 activity data frames from the package database."
+        "Retrieve the 3 activity data frames from the package database. This method retrieves all the activities stored in the database."
         
         driver <- dbDriver("SQLite")
         db <- .database.constants()$db

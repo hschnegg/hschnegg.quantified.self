@@ -30,7 +30,7 @@ the database.
 }
 \section{Methods}{
 \itemize{
-\item \code{read(activityId)}: The read method is used to read and parse a .tcx file. The method expects the Garmin Connect identifier of
+\item \code{read(activityId<U+00A0>=<U+00A0>"", fileName<U+00A0>=<U+00A0>"")}: The read method is used to read and parse a .tcx file. The method expects the Garmin Connect identifier of
 #' the activity as a parameter.
 
 \item \code{readFromDb()}: Retrieve the 3 activity data frames from the package database.
