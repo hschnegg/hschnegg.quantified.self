@@ -6,9 +6,27 @@
 This class offers the framework to deal with accessing
 Garmin Connect (connect.garmin.com)
 }
+\details{
+username field: Your Garmin Connect username
+
+password field: Your Garmin Connect password
+
+login method: Open a connection to the Garmin Connect web
+site using the username and password fields to log you in.
+Returns the CURL handle that can be used to issue queries
+against the Garmin Connect REST API.
+
+retrieveActivityList method: Retrieve a list of the latest
+activities stored in Garmin Connect
+
+downloadTcx method: Download the TCX file for a given
+activity from Garmin Connect. The file is saved in
+/inst/extdata. The method expects an Activity Id as a
+parameter.
+}
 \section{Methods}{
 \itemize{
-\item \code{downloadTCX(activityId)}: Download the TCX file for a given activity from Garmin Connect. The file is saved in /inst/extdata
+\item \code{downloadTcx(activityId)}: Download the TCX file for a given activity from Garmin Connect. The file is saved in /inst/extdata
 
 \item \code{login()}: Login to Garmin Connect (website)
 
@@ -18,6 +36,8 @@ Garmin Connect (connect.garmin.com)
 {
 gc <- garminConnect$new()
 gc$login()
+gc$retrieveActivityList()
+gc$download(454818889)
 }
 }
 \keyword{data}

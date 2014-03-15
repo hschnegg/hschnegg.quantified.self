@@ -13,6 +13,13 @@
 #' The read method is used to read and parse a .tcx file. The method expects the Garmin Connect identifier of
 #' the activity as a parameter.
 #'
+#' saveToDb method:
+#' Save the 3 activity data frames stored in the class fields to the package database.
+#'
+#' readFromDb method:
+#' Retrieve the 3 activity data frames from the package database. Store the data frames into the class fields.
+#' This method retrieves all the activities stored in the database.
+#' 
 #' @export
 #' @import XML
 #' @import RSQLite
@@ -21,6 +28,8 @@
 #' @examples {
 #' f <- tcxFile$new()
 #' f$read(439915418)
+#' f$saveToDb(439915418)
+#' f$readFromDb()
 #' }
 tcxFile <- setRefClass(Class = "tcxFile",
                        fields = list(activity = "data.frame",
