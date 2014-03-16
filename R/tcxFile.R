@@ -87,130 +87,151 @@ tcxFile$methods(
         }
 
         if (fileName == "")
-            stop(paste0("File not found."))
+            stop("File not found.")
 
         doc <- xmlTreeParse(file = fileName, useInternalNodes = TRUE)
 
+        testMissing <- function(v) {
+            if (length(v) == 0) {
+                NA
+            } else {
+                v
+            }
+        }
+
         # Retrieve activitie details
-        actSport <- unlist(getNodeSet(doc = doc,
-                                      path = "//@Sport",
-                                      namespaces="ns"))
-        actTimestamp <- as.POSIXct(unlist(getNodeSet(doc = doc,
-                                                     path = "//ns:Id",
-                                                     namespaces="ns",
-                                                     fun=xmlValue)), format = "%Y-%m-%dT%H:%M:%S.")
+        activity[1, "activity_id"] <<- activityId 
+        activity[1, "sport"] <<- unlist(getNodeSet(doc = doc,
+                                                   path = "//@Sport",
+                                                   namespaces="ns"))
+        activity[1, "timestamp"] <<- as.POSIXct(unlist(getNodeSet(doc = doc,
+                                                                  path = "//ns:Id",
+                                                                  namespaces="ns",
+                                                                  fun=xmlValue)), format = "%Y-%m-%dT%H:%M:%S.")
 
-        activity[1, ] <<- data.frame(activityId, actSport, actTimestamp, stringsAsFactors = FALSE)
+        #activity[1, ] <<- data.frame(activityId, actSport, actTimestamp, stringsAsFactors = FALSE)
 
-        # Retrieve laps
-        lapTimestamp <- as.POSIXct(unlist(getNodeSet(doc = doc,
-                                                     path = "//ns:Activity[1]/ns:Lap/@StartTime",
-                                                     namespaces = "ns")), format = "%Y-%m-%dT%H:%M:%S.")
-        lapTime <- as.numeric(unlist(getNodeSet(doc = doc,
-                                                path = "//ns:Activity[1]/ns:Lap/ns:TotalTimeSeconds",
-                                                namespaces="ns",
-                                                fun=xmlValue)))
-        lapDistance <- as.numeric(unlist(getNodeSet(doc = doc,
-                                                    path = "//ns:Activity[1]/ns:Lap/ns:DistanceMeters",
-                                                    namespaces="ns",
-                                                    fun=xmlValue)))
-        lapMaxSpeed <- as.numeric(unlist(getNodeSet(doc = doc,
-                                                    path = "//ns:Activity[1]/ns:Lap/ns:MaximumSpeed",
-                                                    namespaces="ns",
-                                                    fun=xmlValue)))
-        lapCalories <- as.integer(unlist(getNodeSet(doc = doc,
-                                                    path = "//ns:Activity[1]/ns:Lap/ns:Calories",
-                                                    namespaces="ns",
-                                                    fun=xmlValue)))
-        lapAvgHr <- as.numeric(unlist(getNodeSet(doc = doc,
-                                                 path = "//ns:Activity[1]/ns:Lap/ns:AverageHeartRateBpm",
-                                                 namespaces="ns",
-                                                 fun=xmlValue)))
-        lapMaxHr <- as.numeric(unlist(getNodeSet(doc = doc,
-                                                 path = "//ns:Activity[1]/ns:Lap/ns:MaximumHeartRateBpm",
-                                                 namespaces="ns",
-                                                 fun=xmlValue)))
-        lapIntensity <- as.character(unlist(getNodeSet(doc = doc,
-                                                       path = "//ns:Activity[1]/ns:Lap/ns:Intensity",
-                                                       namespaces="ns",
-                                                       fun=xmlValue)))
-        lapTrigger <- as.character(unlist(getNodeSet(doc = doc,
-                                                     path = "//ns:Activity[1]/ns:Lap/ns:TriggerMethod",
-                                                     namespaces="ns",
-                                                     fun=xmlValue)))
-        lapMaxCadence <- as.integer(unlist(getNodeSet(doc = doc,
-                                                      path = "//ns:Activity[1]/ns:Lap/ns:Extensions/ex:LX/ex:MaxRunCadence",
-                                                      namespaces=c(
-                                                          ns = "http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2",
-                                                          ex = "http://www.garmin.com/xmlschemas/ActivityExtension/v2"),
-                                                      fun=xmlValue)))
-        lapAvgCadence <- as.integer(unlist(getNodeSet(doc = doc,
-                                                      path = "//ns:Activity[1]/ns:Lap/ns:Extensions/ex:LX/ex:AvgRunCadence",
-                                                      namespaces=c(
-                                                          ns = "http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2",
-                                                          ex = "http://www.garmin.com/xmlschemas/ActivityExtension/v2"),
-                                                      fun=xmlValue)))
-        lapAvgSpeed <- as.numeric(unlist(getNodeSet(doc = doc,
-                                                    path = "//ns:Activity[1]/ns:Lap/ns:Extensions/ex:LX/ex:AvgSpeed",
-                                                    namespaces=c(
-                                                        ns = "http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2",
-                                                        ex = "http://www.garmin.com/xmlschemas/ActivityExtension/v2"),
-                                                    fun=xmlValue)))
-        lapSteps <- as.integer(unlist(getNodeSet(doc = doc,
-                                                 path = "//ns:Activity[1]/ns:Lap/ns:Extensions/ex:LX/ex:Steps",
-                                                 namespaces=c(
-                                                     ns = "http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2",
-                                                     ex = "http://www.garmin.com/xmlschemas/ActivityExtension/v2"),
-                                                 fun=xmlValue)))
-
-        lapCount <- length(lapTimestamp)
-        lapId <- seq(from = 1, to = lapCount) 
-
-        lap[lapId, ] <<- data.frame(activityId, lapId, lapTimestamp, lapTime, lapDistance, lapAvgSpeed, lapMaxSpeed, lapCalories, lapAvgHr, lapMaxHr, lapIntensity, lapTrigger, lapMaxCadence, lapAvgCadence, lapSteps, stringsAsFactors = FALSE)
+        lapCount <- getNodeSet(doc = doc,
+                               path = "count(//ns:Activity[1]/ns:Lap)",
+                               namespaces = "ns",
+                               fun = xmlValue)
+                                          
+        for (l in 1:lapCount) {
+            # Retrieve laps
+            lap[l, "activity_id"] <<- activityId
+            lap[l, "lap_id"] <<- l
+            lap[l, "timestamp"] <<- as.POSIXct(testMissing(unlist(getNodeSet(doc = doc,
+                                                                 path = paste0("//ns:Activity[1]/ns:Lap[", l, "]/@StartTime"),
+                                                                 namespaces = "ns"))), format = "%Y-%m-%dT%H:%M:%S.")
+            lap[l, "time"] <<- as.numeric(testMissing(unlist(getNodeSet(doc = doc,
+                                                            path = paste0("//ns:Activity[1]/ns:Lap[", l, "]/ns:TotalTimeSeconds"),
+                                                            namespaces="ns",
+                                                            fun=xmlValue))))
+            lap[l, "distance"] <<- as.numeric(testMissing(unlist(getNodeSet(doc = doc,
+                                                                path = paste0("//ns:Activity[1]/ns:Lap[", l, "]/ns:DistanceMeters"),
+                                                                namespaces="ns",
+                                                                fun=xmlValue))))
+            lap[l, "max_speed"] <<- as.numeric(testMissing(unlist(getNodeSet(doc = doc,
+                                                                 path = paste0("//ns:Activity[1]/ns:Lap[", l, "]/ns:MaximumSpeed"),
+                                                                 namespaces="ns",
+                                                                 fun=xmlValue))))
+            lap[l, "calories"] <<- as.integer(testMissing(unlist(getNodeSet(doc = doc,
+                                                                path = paste0("//ns:Activity[1]/ns:Lap[", l, "]/ns:Calories"),
+                                                                namespaces="ns",
+                                                                fun=xmlValue))))
+            lap[l, "avg_hr"] <<- as.numeric(testMissing(unlist(getNodeSet(doc = doc,
+                                                              path = paste0("//ns:Activity[1]/ns:Lap[", l, "]/ns:AverageHeartRateBpm"),
+                                                              namespaces="ns",
+                                                              fun=xmlValue))))
+            
+            lap[l, "max_hr"] <<- as.numeric(testMissing(unlist(getNodeSet(doc = doc,
+                                                              path = paste0("//ns:Activity[1]/ns:Lap[", l, "]/ns:MaximumHeartRateBpm"),
+                                                              namespaces="ns",
+                                                              fun=xmlValue))))
+            lap[l, "intensity"] <<- as.character(testMissing(unlist(getNodeSet(doc = doc,
+                                                                path = paste0("//ns:Activity[1]/ns:Lap[", l, "]/ns:Intensity"),
+                                                                namespaces="ns",
+                                                                fun=xmlValue))))
+            lap[l, "trigger"] <<- as.character(testMissing(unlist(getNodeSet(doc = doc,
+                                                                path = paste0("//ns:Activity[1]/ns:Lap[", l, "]/ns:TriggerMethod"),
+                                                                namespaces="ns",
+                                                                fun=xmlValue))))
+            lap[l, "max_cadence"] <<- as.integer(testMissing(unlist(getNodeSet(doc = doc,
+                                                                    path = paste0("//ns:Activity[1]/ns:Lap[", l, "]/ns:Extensions/ex:LX/ex:MaxRunCadence"),
+                                                                    namespaces=c(
+                                                                        ns = "http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2",
+                                                                        ex = "http://www.garmin.com/xmlschemas/ActivityExtension/v2"),
+                                                                    fun=xmlValue))))
+            lap[l, "avg_cadence"] <<- as.integer(testMissing(unlist(getNodeSet(doc = doc,
+                                                                   path = paste0("//ns:Activity[1]/ns:Lap[", l, "]/ns:Extensions/ex:LX/ex:AvgRunCadence"),
+                                                                   namespaces=c(
+                                                                       ns = "http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2",
+                                                                       ex = "http://www.garmin.com/xmlschemas/ActivityExtension/v2"),
+                                                                   fun=xmlValue))))
+            lap[l, "avg_speed"] <<- as.numeric(testMissing(unlist(getNodeSet(doc = doc,
+                                                                 path = paste0("//ns:Activity[1]/ns:Lap[", l, "]/ns:Extensions/ex:LX/ex:AvgSpeed"),
+                                                                 namespaces=c(
+                                                                     ns = "http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2",
+                                                                     ex = "http://www.garmin.com/xmlschemas/ActivityExtension/v2"),
+                                                                 fun=xmlValue))))
+            lap[l, "steps"] <<- as.integer(testMissing(unlist(getNodeSet(doc = doc,
+                                                             path = paste0("//ns:Activity[1]/ns:Lap[", l, "]/ns:Extensions/ex:LX/ex:Steps"),
+                                                             namespaces=c(
+                                                                 ns = "http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2",
+                                                                 ex = "http://www.garmin.com/xmlschemas/ActivityExtension/v2"),
+                                                             fun=xmlValue))))
+        }
         
         # Retrieve Trackpoints
-        ignore <- lapply(lapId, function(l) {
-            tpTimestamp <- as.POSIXct(unlist(getNodeSet(doc = doc,
-                                                        path = paste0("//ns:Activity[1]/ns:Lap[", l, "]/ns:Track/ns:Trackpoint/ns:Time"),
-                                                        namespaces="ns",
-                                                        fun=xmlValue)), format = "%Y-%m-%dT%H:%M:%S.")
-            tpLat <- as.numeric(unlist(getNodeSet(doc = doc,
-                                                  path = paste0("//ns:Activity[1]/ns:Lap[", l, "]/ns:Track/ns:Trackpoint/ns:Position/ns:LatitudeDegrees"),
-                                                  namespaces="ns",
-                                                  fun=xmlValue)))
-            tpLong <- as.numeric(unlist(getNodeSet(doc = doc,
-                                                   path = paste0("//ns:Activity[1]/ns:Lap[", l, "]/ns:Track/ns:Trackpoint/ns:Position/ns:LongitudeDegrees"),
-                                                   namespaces="ns",
-                                                   fun=xmlValue)))
-            tpAlt <- as.numeric(unlist(getNodeSet(doc = doc,
-                                                  path = paste0("//ns:Activity[1]/ns:Lap[", l, "]/ns:Track/ns:Trackpoint/ns:AltitudeMeters"),
-                                                  namespaces="ns",
-                                                  fun=xmlValue)))
-            tpDist <- as.numeric(unlist(getNodeSet(doc = doc,
-                                                   path = paste0("//ns:Activity[1]/ns:Lap[", l, "]/ns:Track/ns:Trackpoint/ns:DistanceMeters"),
-                                                   namespaces="ns",
-                                                   fun=xmlValue)))
-            tpSpeed <- as.numeric(unlist(getNodeSet(doc = doc,
-                                                    path = paste0("//ns:Activity[1]/ns:Lap[", l, "]/ns:Track/ns:Trackpoint/ns:Extensions/ex:TPX/ex:Speed"),
-                                                    namespaces=c(
-                                                        ns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2",
+        tpId <- 0
+
+        # Loop on laps
+        ignore <- lapply(lap$lap_id, function(l) {
+
+            tpCount <- getNodeSet(doc = doc,
+                                  path = paste0("count(//ns:Activity[1]/ns:Lap[", l, "]/ns:Track/ns:Trackpoint)"),
+                                  namespaces = "ns",
+                                  fun = xmlValue)
+
+            # Loop on trackpoints
+            for (tp in 1:tpCount) {
+                assign(x = "tpId", value = tpId + 1, inherits = TRUE) 
+                trackpoint[tpId, "activity_id"] <<- activityId
+                trackpoint[tpId, "lap_id"] <<- l
+                trackpoint[tpId, "tp_id"] <<- tpId
+                trackpoint[tpId, "timestamp"] <<- as.POSIXct(testMissing(unlist(getNodeSet(doc = doc,
+                                                                               path = paste0("//ns:Activity[1]/ns:Lap[", l, "]/ns:Track/ns:Trackpoint[", tp, "]/ns:Time"),
+                                                                               namespaces="ns",
+                                                                               fun=xmlValue))), format = "%Y-%m-%dT%H:%M:%S.")
+                trackpoint[tpId, "latitude"] <<- as.numeric(testMissing(unlist(getNodeSet(doc = doc,
+                                                                              path = paste0("//ns:Activity[1]/ns:Lap[", l, "]/ns:Track/ns:Trackpoint[", tp, "]/ns:Position/ns:LatitudeDegrees"),
+                                                                              namespaces="ns",
+                                                                              fun=xmlValue))))
+                trackpoint[tpId, "longitude"] <<- as.numeric(testMissing(unlist(getNodeSet(doc = doc,
+                                                                               path = paste0("//ns:Activity[1]/ns:Lap[", l, "]/ns:Track/ns:Trackpoint[", tp, "]/ns:Position/ns:LongitudeDegrees"),
+                                                                               namespaces="ns",
+                                                                               fun=xmlValue))))
+                trackpoint[tpId, "altitude"] <<- as.numeric(testMissing(unlist(getNodeSet(doc = doc,
+                                                                              path = paste0("//ns:Activity[1]/ns:Lap[", l, "]/ns:Track/ns:Trackpoint[", tp, "]/ns:AltitudeMeters"),
+                                                                              namespaces="ns",
+                                                                              fun=xmlValue))))
+                trackpoint[tpId, "distance"] <<- as.numeric(testMissing(unlist(getNodeSet(doc = doc,
+                                                                             path = paste0("//ns:Activity[1]/ns:Lap[", l, "]/ns:Track/ns:Trackpoint[", tp, "]/ns:DistanceMeters"),
+                                                                             namespaces="ns",
+                                                                             fun=xmlValue))))
+                trackpoint[tpId, "speed"] <<- as.numeric(testMissing(unlist(getNodeSet(doc = doc,
+                                                                           path = paste0("//ns:Activity[1]/ns:Lap[", l, "]/ns:Track/ns:Trackpoint[", tp, "]/ns:Extensions/ex:TPX/ex:Speed"),
+                                                                           namespaces=c(
+                                                                               ns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2",
                                                         ex="http://www.garmin.com/xmlschemas/ActivityExtension/v2"),
-                                                    fun=xmlValue)))
-            tpCadence <- as.integer(unlist(getNodeSet(doc = doc,
-                                                      path = paste0("//ns:Activity[1]/ns:Lap[", l, "]/ns:Track/ns:Trackpoint/ns:Extensions/ex:TPX/ex:RunCadence"),
-                                                      namespaces=c(
-                                                          ns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2",
-                                                          ex="http://www.garmin.com/xmlschemas/ActivityExtension/v2"),
-                                                      fun=xmlValue)))
-
-            lastId <- 0
-            if (nrow(trackpoint) > 0)
-                lastId <- max(trackpoint$tp_id)
-            tpCount <- length(tpTimestamp)           
-            tpId <- seq(from = (lastId + 1), to = (lastId + tpCount))
-            
-            trackpoint[tpId, ] <<- data.frame(rep(activityId, tpCount), rep(l, tpCount), tpId, tpTimestamp, tpLat, tpLong, tpAlt, tpDist, tpSpeed, tpCadence, stringsAsFactors = FALSE)
-
+                                                                           fun=xmlValue))))
+                trackpoint[tpId, "cadence"] <<- as.integer(testMissing(unlist(getNodeSet(doc = doc,
+                                                                             path = paste0("//ns:Activity[1]/ns:Lap[", l, "]/ns:Track/ns:Trackpoint[", tp, "]/ns:Extensions/ex:TPX/ex:RunCadence"),
+                                                                             namespaces=c(
+                                                                                 ns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2",
+                                                                                 ex="http://www.garmin.com/xmlschemas/ActivityExtension/v2"),
+                                                                             fun=xmlValue))))
+            }
             NULL
         })
     })
