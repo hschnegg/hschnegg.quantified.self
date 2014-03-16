@@ -12,4 +12,5 @@ Imports:
     RCurl,
     rjson,
     XML,
-    RSQLite
+    RSQLite,
+    ggmap
