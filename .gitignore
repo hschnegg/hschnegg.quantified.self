@@ -5,3 +5,7 @@
 *.#*
 *.tcx
 *.db
+
+inst/extdata/activity_439915418.tcx
+
+*.db
