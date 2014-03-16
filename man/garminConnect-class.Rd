@@ -1,7 +1,7 @@
 \docType{class}
 \name{garminConnect-class}
 \alias{garminConnect-class}
-\title{Garmin Activity Connect Class}
+\title{Garmin Connect Class}
 \description{
 This class offers the framework to deal with accessing
 Garmin Connect (connect.garmin.com)
