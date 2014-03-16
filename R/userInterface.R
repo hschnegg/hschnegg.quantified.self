@@ -111,6 +111,6 @@ saveGarminActivity <- function(activityId, GCuser = "stats290_test", GCpassword 
 
     f <- tcxFile$new()
     f$read(activityId)
-    f$saveToDb
+    f$saveToDb()
 }
     
