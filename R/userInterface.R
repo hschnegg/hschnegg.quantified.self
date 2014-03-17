@@ -27,8 +27,8 @@ mapActivity <- function(activityId) {
     ggmap(googleMap,
           extent = "device") +
               geom_point(
-                  aes(x = longitude,
-                      y = latitude),
+                  aes(x = get("longitude"),
+                      y = get("latitude")),
                          data = f$trackpoint,
                          colour = "red",
                          size = 1,

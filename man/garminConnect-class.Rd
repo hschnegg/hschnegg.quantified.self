@@ -20,13 +20,12 @@ retrieveActivityList method: Retrieve a list of the latest
 activities stored in Garmin Connect
 
 downloadTcx method: Download the TCX file for a given
-activity from Garmin Connect. The file is saved in
-/inst/extdata. The method expects an Activity Id as a
-parameter.
+activity from Garmin Connect. The file is saved in extdata.
+The method expects an Activity Id as a parameter.
 }
 \section{Methods}{
 \itemize{
-\item \code{downloadTcx(activityId)}: Download the TCX file for a given activity from Garmin Connect. The file is saved in /inst/extdata
+\item \code{downloadTcx(activityId)}: Download the TCX file for a given activity from Garmin Connect. The file is saved in extdata
 
 \item \code{login()}: Login to Garmin Connect (website)
 

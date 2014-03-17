@@ -19,7 +19,7 @@ fields of the class.
 read method: The read method is used to read and parse a
 local .tcx file. The method expects the Garmin Connect
 identifier of an activity or a file name as a parameter.
-The file should be stored in the /inst/extdata folder.
+The file should be stored in the extdata folder.
 
 saveToDb method: Save the 3 activity data frames stored in
 the class fields to the package database.
@@ -33,7 +33,7 @@ stored in the class fields
 }
 \section{Methods}{
 \itemize{
-\item \code{read(activityId<U+00A0>=<U+00A0>"", fileName<U+00A0>=<U+00A0>"")}: The read method is used to read and parse a local .tcx file. The method expects the Garmin Connect identifier of an activity or a file name as a parameter. The file should be stored in the /inst/extdata folder.
+\item \code{read(activityId<U+00A0>=<U+00A0>"", fileName<U+00A0>=<U+00A0>"")}: The read method is used to read and parse a local .tcx file. The method expects the Garmin Connect identifier of an activity or a file name as a parameter. The file should be stored in the extdata folder.
 
 \item \code{readFromDb(activityId<U+00A0>=<U+00A0>"", dataFrames<U+00A0>=<U+00A0>"all")}: Retrieve the activity data frames from the package database. Parameter activityId controls which activity to retrieve (missing is all). Parameter dataFrames controls which data frame to retrieve (missing or 'all' would retrieve all of them). The data frames are stored in the class fields.
 
