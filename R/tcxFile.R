@@ -240,9 +240,8 @@ tcxFile$methods(
     saveToDb = function() {
         "Save the 3 activity data frames (see fields) to the package database."
         
-        driver <- dbDriver("SQLite")
         db <- .database.constants()$db
-        con <- dbConnect(drv = driver, dbname = db)
+        con <- dbConnect(SQLite(), dbname = db)
 
         activity_ <- transform(activity, timestamp = format(timestamp, format = "%Y-%m-%dT%H:%M:%S.", usetz = TRUE))
         lap_ <- transform(lap, timestamp = format(timestamp, format = "%Y-%m-%dT%H:%M:%S.", usetz = TRUE))
@@ -264,7 +263,7 @@ tcxFile$methods(
 tcxFile$methods(
     readFromDb = function(activityId = "", dataFrames = "all") {
         "Retrieve the activity data frames from the package database. Parameter activityId controls which activity to retrieve (missing is all). Parameter dataFrames controls which data frame to retrieve (missing or 'all' would retrieve all of them). The data frames are stored in the class fields."
-
+        
         dataFrames <- match.arg(arg=dataFrames, choices=c("all", "activity", "lap", "trackpoint"), several.ok=TRUE)
         if ("all" %in% dataFrames)
             dataFrames <- c("activity", "lap", "trackpoint")
@@ -274,9 +273,8 @@ tcxFile$methods(
         else
             activityId <- paste0("'", activityId, "'")
     
-        driver <- dbDriver("SQLite")
         db <- .database.constants()$db
-        con <- dbConnect(drv = driver, dbname = db)
+        con <- dbConnect(SQLite(), dbname = db)
 
         ignore <- lapply(dataFrames, function(t) {
             sql <- paste0("select * from ", t, " where activity_id = ", activityId)
