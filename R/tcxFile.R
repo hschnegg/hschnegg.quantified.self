@@ -30,7 +30,7 @@
 #' @examples \dontrun{
 #' f <- tcxFile$new()
 #' f$read(439915418)
-#' f$saveToDb(439915418)
+#' f$saveToDb()
 #' f$readFromDb()
 #' }
 tcxFile <- setRefClass(Class = "tcxFile",

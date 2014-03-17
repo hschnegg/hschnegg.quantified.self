@@ -10,7 +10,7 @@
 #' 
 #' @keywords fitness, data
 #' @examples \dontrun{
-#' mapActivity(439915418)
+#' mapActivity(439915402)
 #' }
 mapActivity <- function(activityId) {
     # Retrieve data from database

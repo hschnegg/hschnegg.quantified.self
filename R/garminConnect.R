@@ -31,7 +31,7 @@
 #' gc <- garminConnect$new()
 #' gc$login()
 #' gc$retrieveActivityList()
-#' gc$download(454818889)
+#' gc$download(433485172)
 #' }
 garminConnect <- setRefClass(Class = "garminConnect",
                                 fields = list(username = "character",
