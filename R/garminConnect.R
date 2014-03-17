@@ -39,8 +39,7 @@ garminConnect <- setRefClass(Class = "garminConnect",
                                               act = "integer",
                                               lap = "integer",
                                               lapId = "integer",
-                                              trackpointId = "integer",
-                                              vec = "character"
+                                              trackpointId = "integer"
                                     ))
 
 garminConnect$methods(
