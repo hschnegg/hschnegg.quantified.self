@@ -9,7 +9,7 @@
     "Constants used to work with package database"
 
     dbFileName <- "hschnegg.quantified.self.db"
-    db <- system.file(package = .global.constants()$packageName, "inst", "extdata", dbFileName)
+    db <- system.file(package = .global.constants()$packageName, "extdata", dbFileName)
 
     list(db = db)
     

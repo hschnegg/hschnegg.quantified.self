@@ -18,8 +18,8 @@
 #' Retrieve a list of the latest activities stored in Garmin Connect
 #'
 #' downloadTcx method:
-#' Download the TCX file for a given activity from Garmin Connect. The file is saved in
-#' /inst/extdata. The method expects an Activity Id as a parameter.
+#' Download the TCX file for a given activity from Garmin Connect. The file
+#' is saved in extdata. The method expects an Activity Id as a parameter.
 #' 
 #'
 #' @export
@@ -62,7 +62,7 @@ garminConnect$methods(
         curlHandle <- getCurlHandle()
 
         curlSetOpt(curl = curlHandle,
-                   cookiefile = system.file(package = .global.constants()$packageName, "inst", "extdate", "gc_cookies.txt"),
+                   cookiefile = system.file(package = .global.constants()$packageName, "extdate", "gc_cookies.txt"),
                    followlocation = FALSE,
                    verbose = FALSE,
                    header = TRUE)
@@ -136,11 +136,11 @@ garminConnect$methods(
 
 garminConnect$methods(
     downloadTcx = function(activityId) {
-        "Download the TCX file for a given activity from Garmin Connect. The file is saved in /inst/extdata"
+        "Download the TCX file for a given activity from Garmin Connect. The file is saved in extdata"
         
         curlHandle <- login()
 
-        fileName <- paste0(system.file(package = .global.constants()$packageName, "inst", "extdata"), paste0("/activity_", activityId, ".tcx"))
+        fileName <- paste0(system.file(package = .global.constants()$packageName, "extdata"), paste0("/activity_", activityId, ".tcx"))
         urlTcxFile <- sub(pattern = "XXX", replacement = activityId, x = .garmin.constants()$urlGCtcxFile)
 
         activity <- getURLContent(url = urlTcxFile, curl = curlHandle)

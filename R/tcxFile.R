@@ -11,7 +11,7 @@
 #'
 #' read method:
 #' The read method is used to read and parse a local .tcx file. The method expects the Garmin Connect identifier
-#' of an activity or a file name as a parameter. The file should be stored in the /inst/extdata folder.
+#' of an activity or a file name as a parameter. The file should be stored in the extdata folder.
 #'
 #' saveToDb method:
 #' Save the 3 activity data frames stored in the class fields to the package database.
@@ -78,12 +78,12 @@ tcxFile$methods(
 
 tcxFile$methods(
     read = function(activityId = "", fileName = "") {
-        "The read method is used to read and parse a local .tcx file. The method expects the Garmin Connect identifier of an activity or a file name as a parameter. The file should be stored in the /inst/extdata folder."
+        "The read method is used to read and parse a local .tcx file. The method expects the Garmin Connect identifier of an activity or a file name as a parameter. The file should be stored in the extdata folder."
         
         if (activityId != "") {
-            fileName <- system.file(package = .global.constants()$packageName, "inst", "extdata", paste0("activity_", activityId, ".tcx"))
+            fileName <- system.file(package = .global.constants()$packageName, "extdata", paste0("activity_", activityId, ".tcx"))
         } else if (fileName != "") {
-            fileName <- system.file(package = .global.constants()$packageName, "inst", "extdata", fileName)
+            fileName <- system.file(package = .global.constants()$packageName, "extdata", fileName)
         }
 
         if (fileName == "")
