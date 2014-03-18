@@ -1,6 +1,6 @@
 \docType{class}
-\name{tcxFile-class}
-\alias{tcxFile-class}
+\name{tcxFile}
+\alias{tcxFile}
 \title{TCX File Class}
 \description{
 Class used to manage a typycal Garmin Connect file (.tcx).
@@ -43,7 +43,7 @@ stored in the class fields
 \dontrun{
 f <- tcxFile$new()
 f$read(439915418)
-f$saveToDb(439915418)
+f$saveToDb()
 f$readFromDb()
 }
 }

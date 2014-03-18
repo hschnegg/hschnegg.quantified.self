@@ -14,7 +14,7 @@ database.
 }
 \examples{
 \dontrun{
-mapActivity(439915418)
+mapActivity(439915402)
 }
 }
 \keyword{data}

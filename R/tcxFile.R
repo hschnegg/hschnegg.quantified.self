@@ -22,7 +22,6 @@
 #' - Parameter dataFrames: controls which data frame to retrieve (missing or 'all' would retrieve all of them).
 #' The data frames are stored in the class fields
 #' 
-#' @export
 #' @import XML
 #' @import RSQLite
 #' 

@@ -1,6 +1,6 @@
 \docType{class}
-\name{garminConnect-class}
-\alias{garminConnect-class}
+\name{garminConnect}
+\alias{garminConnect}
 \title{Garmin Connect Class}
 \description{
 This class offers the framework to deal with accessing
@@ -36,7 +36,7 @@ The method expects an Activity Id as a parameter.
 gc <- garminConnect$new()
 gc$login()
 gc$retrieveActivityList()
-gc$download(454818889)
+gc$download(433485172)
 }
 }
 \keyword{data}

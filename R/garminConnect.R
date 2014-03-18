@@ -21,8 +21,6 @@
 #' Download the TCX file for a given activity from Garmin Connect. The file
 #' is saved in extdata. The method expects an Activity Id as a parameter.
 #' 
-#'
-#' @export
 #' @import RCurl
 #' @import rjson
 #' 
