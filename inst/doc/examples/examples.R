@@ -1,5 +1,5 @@
 # Install package
-install.packages("hschnegg.quantified.self_0.1.tar.gz", repos=NULL, type=“source”)
+install.packages("hschnegg.quantified.self_0.1.tar.gz", repos=NULL, type="source")
 
 # Load package
 library(hschnegg.quantified.self)
@@ -42,11 +42,11 @@ gc$retrieveActivityList()
 # Download a Garmin Connect activity file (.tcx)
 gc$downloadTcx(454818889)
 
-# Plot an activity available in the database on a Google map
-mapActivity(433485172)
-
 # Download an activity from Garmin Connect and save it to the local database
 retrieveActivity(454818889)
 
 # Delete the previously loaded activity from the database
 deleteActivity(454818889)
+
+# Plot an activity available in the database on a Google map
+mapActivity(433485172)
