@@ -160,7 +160,7 @@ deleteActivity <- function(activityId) {
     ignore <- lapply(tables, function(t) {
         sql <- paste0("delete from ", t, " where activity_id = ", activityId)
         res <- dbGetQuery(con, sql)
-        cat(paste0("Activity", activityId, "deleted from table", t, "\n"))
+        cat(paste0("Activity ", activityId, " deleted from table ", t, "\n"))
     })
 }
                      
