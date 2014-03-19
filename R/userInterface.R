@@ -18,7 +18,7 @@ mapActivity <- function(activityId) {
     f$readFromDb(activityId, c("activity", "trackpoint"))
 
     # Retrieve Google map
-    boundingBox <- make_bbox(lon = f$trackpoint$longitude, lat = f$trackpoint$latitude, f = .1)
+    boundingBox <- make_bbox(lon = f$trackpoint$longitude, lat = f$trackpoint$latitude, f = .2)
     googleMap <- get_map(location = boundingBox,
                          source = "google",
                          maptype = c("roadmap"))
