@@ -39,7 +39,7 @@ mapActivity <- function(activityId) {
 
 #' listLoadedActivity function
 #'
-#' List all the activities already loaded into the package internal database. Return
+#' List all the activities already loaded into the package internal database. Returns
 #' a data frame.
 #'
 #' @export
@@ -59,7 +59,7 @@ listLoadedActivity <- function() {
 
 #' listGarminConnectActivity function
 #'
-#' List activities stored in Garmin Connect. Return a data frame.
+#' List activities stored in Garmin Connect. Returns a data frame.
 #'
 #' @param GCuser Garmin Connect username
 #' @param GCpassword Garmin Connect password
@@ -83,6 +83,7 @@ listGarminConnectActivity <- function(GCuser = "stats290_test", GCpassword = "st
 #' listNewActivity function
 #'
 #' List activities stored in Garmin Connect that are not yet stored in the local database.
+#' Returns a data frame.
 #'
 #' @param GCuser Garmin Connect username
 #' @param GCpassword Garmin Connect password
@@ -102,6 +103,21 @@ listNewActivity <- function(GCuser = "stats290_test", GCpassword = "stats290_tes
 }
 
 
+#' saveGarminActivity function
+#'
+#' The function reads a local .tcx file, parses it and saves the data into the
+#' local database.
+#'
+#' @param activityId Activity id or .tcx file name
+#' @param GCuser Garmin Connect username
+#' @param GCpassword Garmin Connect password
+#'
+#' @export
+#' 
+#' @keywords fitness, data
+#' @examples \dontrun{
+#' listGarminConnectActivity()
+#' }
 saveGarminActivity <- function(activityId, GCuser = "stats290_test", GCpassword = "stats290_test") {
     gc <- garminConnect$new()
     gc$username <- GCuser

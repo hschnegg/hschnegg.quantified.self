@@ -11,8 +11,8 @@
 #'
 #' login method:
 #' Open a connection to the Garmin Connect web site using the username and password fields to
-#' log you in. Returns
-#' the CURL handle that can be used to issue queries against the Garmin Connect REST API.
+#' log you in. Returns the CURL handle that can be used to issue queries against the Garmin
+#' Connect REST API.
 #'
 #' retrieveActivityList method:
 #' Retrieve a list of the latest activities stored in Garmin Connect
@@ -29,7 +29,7 @@
 #' gc <- garminConnect$new()
 #' gc$login()
 #' gc$retrieveActivityList()
-#' gc$download(433485172)
+#' gc$download(454818889)
 #' }
 garminConnect <- setRefClass(Class = "garminConnect",
                                 fields = list(username = "character",
@@ -133,7 +133,7 @@ garminConnect$methods(
 
 garminConnect$methods(
     downloadTcx = function(activityId) {
-        "Download the TCX file for a given activity from Garmin Connect. The file is saved in extdata"
+        "Download the TCX file for a given activity from Garmin Connect. The file is saved in extdata. Expects the activity id as a parameter. The file is saved in extdata."
         
         curlHandle <- login()
 

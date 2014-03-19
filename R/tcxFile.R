@@ -39,6 +39,7 @@ tcxFile <- setRefClass(Class = "tcxFile",
 
 tcxFile$methods(
     initialize = function(...) {
+        "Define the structure of the three data frames."
         activity <<- data.frame(activity_id = character(),
                                 sport = character(),
                                 timestamp = as.POSIXct(character(), format = "%Y-%m-%dT%H:%M:%S."),
@@ -90,6 +91,7 @@ tcxFile$methods(
 
         doc <- xmlTreeParse(file = fileName, useInternalNodes = TRUE)
 
+        # Used to deal with missing elements in the XML
         testMissing <- function(v) {
             if (length(v) == 0) {
                 NA
@@ -108,13 +110,12 @@ tcxFile$methods(
                                                                   namespaces="ns",
                                                                   fun=xmlValue)), format = "%Y-%m-%dT%H:%M:%S.")
 
-        #activity[1, ] <<- data.frame(activityId, actSport, actTimestamp, stringsAsFactors = FALSE)
-
         lapCount <- getNodeSet(doc = doc,
                                path = "count(//ns:Activity[1]/ns:Lap)",
                                namespaces = "ns",
                                fun = xmlValue)
-                                          
+        
+        # Iterate over laps                                  
         for (l in 1:lapCount) {
             # Retrieve laps
             lap[l, "activity_id"] <<- activityId
