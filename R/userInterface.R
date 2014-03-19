@@ -92,23 +92,25 @@ listGarminConnectActivity <- function(GCuser = "stats290_test", GCpassword = "st
 #' 
 #' @keywords fitness, data
 #' @examples \dontrun{
-#' listGarminConnectActivity()
+#' listNewActivity()
 #' }
 listNewActivity <- function(GCuser = "stats290_test", GCpassword = "stats290_test") {
+    # Retrieve Garmin Connect and local activities
     GCactivity <- listGarminConnectActivity(GCuser = GCuser, GCpassword = GCpassword)
     GCactivityId <- as.character(GCactivity$id)
     localActivityId <- as.character(listLoadedActivity()$activity_id)
 
+    # Returns the delta
     GCactivity[!(GCactivityId %in% localActivityId), ]
 }
 
 
-#' saveGarminActivity function
+#' retrieveActivity function
 #'
-#' The function reads a local .tcx file, parses it and saves the data into the
-#' local database.
+#' The function downloads an activity from Garmin Connect, parses the .tcx file
+#' and saves the data into the local database.
 #'
-#' @param activityId Activity id or .tcx file name
+#' @param activityId Garmin Connect activity id
 #' @param GCuser Garmin Connect username
 #' @param GCpassword Garmin Connect password
 #'
@@ -116,17 +118,48 @@ listNewActivity <- function(GCuser = "stats290_test", GCpassword = "stats290_tes
 #' 
 #' @keywords fitness, data
 #' @examples \dontrun{
-#' listGarminConnectActivity()
+#' retrieveActivity()
 #' }
-saveGarminActivity <- function(activityId, GCuser = "stats290_test", GCpassword = "stats290_test") {
+retrieveActivity <- function(activityId, GCuser = "stats290_test", GCpassword = "stats290_test") {
+    # Initialise Garmin Connect class
     gc <- garminConnect$new()
     gc$username <- GCuser
     gc$password <- GCpassword
 
+    # Download activity from Garmin Connect website
     gc$downloadTcx(activityId)
-
+    
+    # Save the activity to the local database
     f <- tcxFile$new()
     f$read(activityId)
     f$saveToDb()
 }
-    
+
+
+#' deleteActivity function
+#'
+#' Delete an activity from the local database.
+#' 
+#' @param activityId A Garmin Connect activity id
+#'
+#' @export
+#' @import RSQLite
+#' 
+#' @keywords fitness, data
+#' @examples \dontrun{
+#' deleteActivity(433485172)
+#' }
+deleteActivity <- function(activityId) {
+    # Local database connection
+    db <- .database.constants()$db
+    con <- dbConnect(SQLite(), dbname = db)
+
+    tables <- c("activity", "lap", "trackpoint")
+
+    # Delete activity from the three tables
+    ignore <- lapply(tables, function(t) {
+        sql <- paste0("delete from ", t, " where activity_id = ", activityId)
+        res <- dbGetQuery(con, sql)
+    })
+}
+                     
