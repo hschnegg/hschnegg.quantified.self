@@ -1,6 +1,6 @@
 \docType{class}
 \name{garminConnect}
-\alias{garminConnect}
+\alias{garminConnect-class}
 \title{Garmin Connect Class}
 \description{
 This class offers the framework to deal with accessing
@@ -25,7 +25,7 @@ The method expects an Activity Id as a parameter.
 }
 \section{Methods}{
 \itemize{
-\item \code{downloadTcx(activityId)}: Download the TCX file for a given activity from Garmin Connect. The file is saved in extdata
+\item \code{downloadTcx(activityId)}: Download the TCX file for a given activity from Garmin Connect. The file is saved in extdata. Expects the activity id as a parameter. The file is saved in extdata.
 
 \item \code{login()}: Login to Garmin Connect (website)
 
@@ -36,7 +36,7 @@ The method expects an Activity Id as a parameter.
 gc <- garminConnect$new()
 gc$login()
 gc$retrieveActivityList()
-gc$download(433485172)
+gc$download(454818889)
 }
 }
 \keyword{data}

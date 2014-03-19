@@ -11,7 +11,7 @@ listGarminConnectActivity(GCuser = "stats290_test",
   \item{GCpassword}{Garmin Connect password}
 }
 \description{
-List activities stored in Garmin Connect. Return a data
+List activities stored in Garmin Connect. Returns a data
 frame.
 }
 \examples{

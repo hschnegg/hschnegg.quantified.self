@@ -11,11 +11,11 @@ listNewActivity(GCuser = "stats290_test", GCpassword = "stats290_test")
 }
 \description{
 List activities stored in Garmin Connect that are not yet
-stored in the local database.
+stored in the local database. Returns a data frame.
 }
 \examples{
 \dontrun{
-listGarminConnectActivity()
+listNewActivity()
 }
 }
 \keyword{data}

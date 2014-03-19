@@ -6,7 +6,7 @@ listLoadedActivity()
 }
 \description{
 List all the activities already loaded into the package
-internal database. Return a data frame.
+internal database. Returns a data frame.
 }
 \examples{
 \dontrun{
