@@ -1,6 +1,6 @@
 \docType{class}
 \name{tcxFile}
-\alias{tcxFile-class}
+\alias{tcxFile}
 \title{TCX File Class}
 \description{
 Class used to manage a typycal Garmin Connect file (.tcx).

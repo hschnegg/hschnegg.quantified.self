@@ -1,6 +1,6 @@
 \docType{class}
 \name{garminConnect}
-\alias{garminConnect-class}
+\alias{garminConnect}
 \title{Garmin Connect Class}
 \description{
 This class offers the framework to deal with accessing

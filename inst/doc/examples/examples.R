@@ -49,4 +49,4 @@ retrieveActivity(454818889)
 deleteActivity(454818889)
 
 # Plot an activity available in the database on a Google map
-mapActivity(433485172)
+mapActivity(439915402)
